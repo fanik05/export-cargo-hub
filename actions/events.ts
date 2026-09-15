@@ -10,7 +10,8 @@ export async function addEventAction(shipmentId: string, _prev: ActionResult, fo
   await requireAdmin();
   const parsed = parseForm(eventSchema, formData);
   if (!parsed.ok) return { ok: false, fieldErrors: parsed.fieldErrors };
-  await addEvent(shipmentId, parsed.data);
+  const result = await addEvent(shipmentId, parsed.data);
+  if (!result.ok) return { ok: false, message: result.message };
   revalidateShipment(shipmentId);
   return { ok: true };
 }

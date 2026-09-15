@@ -18,8 +18,13 @@ async function recomputeStatus(tx: Tx, shipmentId: string) {
   }
 }
 
-export async function addEvent(shipmentId: string, input: EventInput): Promise<{ id: string }> {
+export async function addEvent(
+  shipmentId: string,
+  input: EventInput,
+): Promise<{ ok: true; id: string } | { ok: false; message: string }> {
   return prisma.$transaction(async (tx) => {
+    const shipment = await tx.shipment.findUnique({ where: { id: shipmentId }, select: { id: true } });
+    if (!shipment) return { ok: false as const, message: "Shipment not found" };
     const event = await tx.shipmentEvent.create({
       data: {
         shipmentId,
@@ -31,7 +36,7 @@ export async function addEvent(shipmentId: string, input: EventInput): Promise<{
       select: { id: true },
     });
     await recomputeStatus(tx, shipmentId);
-    return event;
+    return { ok: true as const, id: event.id };
   });
 }
 

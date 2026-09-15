@@ -27,7 +27,9 @@ describe.skipIf(!hasTestDb)("event service", () => {
   });
 
   it("deleting the latest event rolls the status back", async () => {
-    const { id } = await addEvent(shipmentId, { type: "DELIVERED", occurredAt: new Date(Date.now() + 60_000), location: null, note: null });
+    const r = await addEvent(shipmentId, { type: "DELIVERED", occurredAt: new Date(Date.now() + 60_000), location: null, note: null });
+    if (!r.ok) throw new Error(r.message);
+    const { id } = r;
     expect((await getShipmentById(shipmentId))?.status).toBe("DELIVERED");
     expect(await deleteEvent(id)).toEqual({ ok: true });
     expect((await getShipmentById(shipmentId))?.status).toBe("BOOKED");
@@ -42,5 +44,14 @@ describe.skipIf(!hasTestDb)("event service", () => {
 
   it("returns a message for an unknown event id", async () => {
     expect((await deleteEvent("nope")).ok).toBe(false);
+  });
+
+  it("returns a message for an unknown shipment id and inserts nothing", async () => {
+    const before = await prisma.shipmentEvent.count();
+    expect(await addEvent("nope", { type: "IN_TRANSIT", occurredAt: new Date(), location: null, note: null })).toEqual({
+      ok: false,
+      message: "Shipment not found",
+    });
+    expect(await prisma.shipmentEvent.count()).toBe(before);
   });
 });
