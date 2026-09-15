@@ -3,7 +3,7 @@ import { z } from "zod";
 const safeNext = z
   .string()
   .optional()
-  .transform((v) => (v && v.startsWith("/") && !v.startsWith("//") ? v : "/admin"));
+  .transform((v) => (v && /^\/(?![/\\])/.test(v) ? v : "/admin"));
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
