@@ -1,7 +1,7 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../lib/generated/prisma/client";
+import { PrismaClient } from "@/lib/generated/prisma/client";
 
 async function main() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
