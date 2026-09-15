@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import type { EventType, Prisma } from "@/lib/generated/prisma/client";
+import { Prisma, type EventType } from "@/lib/generated/prisma/client";
 import { formatTrackingNumber } from "@/lib/tracking/status";
 import { generateShareToken } from "@/lib/tracking/token";
 import { shipmentWithEventsArgs, type ShipmentWithEvents } from "@/lib/tracking/public";
@@ -48,8 +48,8 @@ async function createOnce(input: ShipmentInput) {
   });
 }
 
-function isUniqueViolation(err: unknown) {
-  return typeof err === "object" && err !== null && "code" in err && (err as { code: string }).code === "P2002";
+function isUniqueViolation(err: unknown): boolean {
+  return err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002";
 }
 
 /** Creates the shipment, its first BOOKED event, and issues the next tracking number. Retries once on a unique-constraint race. */

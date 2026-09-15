@@ -23,8 +23,8 @@ export async function addEvent(
   input: EventInput,
 ): Promise<{ ok: true; id: string } | { ok: false; message: string }> {
   return prisma.$transaction(async (tx) => {
-    const shipment = await tx.shipment.findUnique({ where: { id: shipmentId }, select: { id: true } });
-    if (!shipment) return { ok: false as const, message: "Shipment not found" };
+    const locked = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "Shipment" WHERE id = ${shipmentId} FOR UPDATE`;
+    if (locked.length === 0) return { ok: false as const, message: "Shipment not found" };
     const event = await tx.shipmentEvent.create({
       data: {
         shipmentId,
@@ -44,6 +44,7 @@ export async function deleteEvent(eventId: string): Promise<{ ok: true } | { ok:
   return prisma.$transaction(async (tx) => {
     const event = await tx.shipmentEvent.findUnique({ where: { id: eventId }, select: { shipmentId: true } });
     if (!event) return { ok: false as const, message: "Event not found" };
+    await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "Shipment" WHERE id = ${event.shipmentId} FOR UPDATE`;
     const count = await tx.shipmentEvent.count({ where: { shipmentId: event.shipmentId } });
     if (count <= 1) return { ok: false as const, message: "A shipment must keep at least one event" };
     await tx.shipmentEvent.delete({ where: { id: eventId } });

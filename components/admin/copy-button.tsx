@@ -10,8 +10,12 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
       variant="outline"
       size="sm"
       onClick={async () => {
-        await navigator.clipboard.writeText(value);
-        toast.success(`${label} copied`);
+        try {
+          await navigator.clipboard.writeText(value);
+          toast.success(`${label} copied`);
+        } catch {
+          toast.error("Copy failed — your browser blocked clipboard access");
+        }
       }}
     >
       Copy {label.toLowerCase()}

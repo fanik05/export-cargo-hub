@@ -17,7 +17,8 @@ export default async function AdminShipmentsPage(props: PageProps<"/admin">) {
   const q = first(sp.q);
   const statusRaw = first(sp.status);
   const status = (EVENT_TYPES as readonly string[]).includes(statusRaw) ? (statusRaw as EventType) : undefined;
-  const page = Math.max(1, Number(first(sp.page)) || 1);
+  const raw = Number(first(sp.page));
+  const page = Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : 1;
 
   const { rows, hasMore } = await listShipments({ q, status, page });
 

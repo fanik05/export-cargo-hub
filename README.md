@@ -70,6 +70,21 @@ The app runs at http://localhost:3000. Sign in at `/login` with the
 | `npm run db:seed` | Seed the first admin user (`prisma/seed.ts`) |
 | `npx prisma studio` | Open the database visualizer |
 
+## Deploying
+
+Required environment variables in production:
+
+- `DATABASE_URL` — the Postgres connection string
+- `SESSION_SECRET` — 32+ random bytes used to sign the session cookie
+
+`ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_NAME` are only needed to run the
+seed script (`npm run db:seed`) — they are not read at runtime otherwise.
+
+`npm run build` runs `prisma generate` before `next build`, so the generated
+client is always up to date with `prisma/schema.prisma`; it does not push the
+schema or seed data. Seeding the first admin user is a one-time manual step
+(`npm run db:seed`), not part of the build.
+
 ### Enabling integration tests
 
 Unit tests (`tests/unit/`) always run. Integration tests (`tests/integration/`)

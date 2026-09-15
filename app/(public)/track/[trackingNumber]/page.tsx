@@ -6,7 +6,10 @@ import { TrackSearch } from "@/components/tracking/track-search";
 
 export async function generateMetadata(props: PageProps<"/track/[trackingNumber]">): Promise<Metadata> {
   const { trackingNumber } = await props.params;
-  return { title: `${normalizeTrackingNumber(safeDecode(trackingNumber))} · Export Cargo Hub` };
+  return {
+    title: `${normalizeTrackingNumber(safeDecode(trackingNumber))} · Export Cargo Hub`,
+    robots: { index: false },
+  };
 }
 
 export default async function TrackPage(props: PageProps<"/track/[trackingNumber]">) {
