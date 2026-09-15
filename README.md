@@ -26,7 +26,7 @@ yet.
 
 ## Prerequisites
 
-- Node.js 20+ (developed on 24.x)
+- Node.js 22.12+ (developed on 24.x)
 - npm 10+
 - A reachable PostgreSQL database
 
@@ -119,7 +119,6 @@ lib/
 prisma/
   schema.prisma               Data model
   seed.ts                     Seeds the first admin user
-public/                       Static assets
 tests/
   unit/                       Pure-function tests (always run)
   integration/                Service-layer tests against a real database (need `TEST_DATABASE_URL`)
