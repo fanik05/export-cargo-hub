@@ -9,6 +9,10 @@ export default defineConfig({
     setupFiles: ["tests/setup.ts"],
     include: ["tests/**/*.test.ts"],
     fileParallelism: false,
+    // Integration tests hit a hosted Postgres (~300ms per round trip from a laptop);
+    // a single test can need 20+ round trips.
+    testTimeout: 60_000,
+    hookTimeout: 60_000,
   },
   resolve: {
     alias: {

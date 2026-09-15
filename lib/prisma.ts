@@ -9,7 +9,13 @@ function createClient() {
     throw new Error("DATABASE_URL is not set");
   }
   const adapter = new PrismaPg({ connectionString });
-  return new PrismaClient({ adapter });
+  return new PrismaClient({
+    adapter,
+    // Hosted Postgres over the public internet can take >2s to hand out a fresh pooled
+    // connection under concurrent load; Prisma's defaults (maxWait 2s, timeout 5s) assume
+    // a local database.
+    transactionOptions: { maxWait: 10_000, timeout: 20_000 },
+  });
 }
 
 export const prisma = globalForPrisma.prisma ?? createClient();
