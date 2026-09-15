@@ -8,13 +8,13 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
     <Button
       type="button"
       variant="outline"
-      size="sm"
+      className="h-9 rounded-md px-3.5 text-sm"
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
           toast.success(`${label} copied`);
         } catch {
-          toast.error("Copy failed — your browser blocked clipboard access");
+          toast.error("Your browser blocked clipboard access. Copy the value by hand.");
         }
       }}
     >

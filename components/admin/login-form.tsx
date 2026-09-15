@@ -5,7 +5,7 @@ import { login } from "@/actions/auth";
 import { INITIAL_ACTION_STATE } from "@/lib/validation/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Field, controlClass } from "@/components/admin/form-field";
 
 export function LoginForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState(login, INITIAL_ACTION_STATE);
@@ -14,18 +14,32 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="next" value={next ?? "/admin"} />
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" autoComplete="email" required aria-invalid={!!errors.email} />
-        {errors.email && <p className="text-xs text-destructive">{errors.email[0]}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" autoComplete="current-password" required aria-invalid={!!errors.password} />
-        {errors.password && <p className="text-xs text-destructive">{errors.password[0]}</p>}
-      </div>
+      <Field id="email" label="Email" errors={errors.email}>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          className={controlClass}
+          aria-invalid={!!errors.email}
+          required
+        />
+      </Field>
+      <Field id="password" label="Password" errors={errors.password}>
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          className={controlClass}
+          aria-invalid={!!errors.password}
+          required
+        />
+      </Field>
       {!state.ok && state.message && <p className="text-sm text-destructive">{state.message}</p>}
-      <Button type="submit" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</Button>
+      <Button type="submit" disabled={pending} className="h-10 w-full rounded-md text-sm">
+        {pending ? "Signing in…" : "Sign in"}
+      </Button>
     </form>
   );
 }

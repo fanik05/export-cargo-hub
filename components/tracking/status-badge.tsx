@@ -3,15 +3,23 @@ import { EVENT_LABELS, STATUS_TONE, type StatusTone } from "@/lib/tracking/statu
 import { cn } from "@/lib/utils";
 
 const toneClass: Record<StatusTone, string> = {
-  neutral: "border-border bg-muted text-foreground",
-  info: "border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-200",
-  success: "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
-  warning: "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200",
+  neutral: "bg-muted text-foreground",
+  info: "bg-transit-soft text-transit",
+  // Darker greens/ambers than the raw tokens so 12px text clears 4.5:1 on the soft fills.
+  success: "bg-success-soft text-[#15803D]",
+  warning: "bg-amber-soft text-[#92400E]",
 };
 
 export function StatusBadge({ status, className }: { status: EventType; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center border px-2 py-0.5 text-xs font-medium whitespace-nowrap", toneClass[STATUS_TONE[status]], className)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium whitespace-nowrap",
+        toneClass[STATUS_TONE[status]],
+        className,
+      )}
+    >
+      <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-current" />
       {EVENT_LABELS[status]}
     </span>
   );

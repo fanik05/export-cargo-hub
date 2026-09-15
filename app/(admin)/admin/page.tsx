@@ -28,16 +28,33 @@ export default async function AdminShipmentsPage(props: PageProps<"/admin">) {
   nextParams.set("page", String(page + 1));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-lg font-semibold">Shipments</h1>
-        <Button render={<Link href="/admin/shipments/new" />} size="sm">New shipment</Button>
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-[28px] font-semibold tracking-[-0.01em]">Shipments</h1>
+        <Button
+          render={<Link href="/admin/shipments/new" />}
+          className="h-9 rounded-md px-4 text-sm"
+        >
+          New shipment
+        </Button>
       </div>
-      <SearchForm q={q} status={status ?? ""} />
-      <ShipmentTable rows={rows} />
+
+      <div className="overflow-hidden rounded-md border border-border bg-card">
+        <div className="border-b border-border p-4">
+          <SearchForm q={q} status={status ?? ""} />
+        </div>
+        <ShipmentTable rows={rows} />
+      </div>
+
       {hasMore && (
         <div className="flex justify-center">
-          <Button render={<Link href={`/admin?${nextParams}`} />} variant="outline" size="sm">Load more</Button>
+          <Button
+            render={<Link href={`/admin?${nextParams}`} />}
+            variant="outline"
+            className="h-9 rounded-md px-4 text-sm"
+          >
+            Load more
+          </Button>
         </div>
       )}
     </div>

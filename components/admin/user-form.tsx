@@ -5,8 +5,7 @@ import { toast } from "sonner";
 import { createUserAction } from "@/actions/users";
 import { INITIAL_ACTION_STATE } from "@/lib/validation/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FieldError } from "@/components/admin/field-error";
+import { Field, controlClass } from "@/components/admin/form-field";
 import { SubmitButton } from "@/components/admin/submit-button";
 
 export function UserForm() {
@@ -21,25 +20,32 @@ export function UserForm() {
   }, [state]);
 
   return (
-    <form ref={formRef} action={formAction} className="grid max-w-2xl grid-cols-1 gap-3 md:grid-cols-3">
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="name">Name</Label>
-        <Input id="name" name="name" required />
-        <FieldError errors={errors.name} />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" required />
-        <FieldError errors={errors.email} />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" required />
-        <FieldError errors={errors.password} />
-      </div>
-      <div className="md:col-span-3">
-        <SubmitButton size="sm" pendingText="Adding…">Add admin</SubmitButton>
-      </div>
-    </form>
+    <section className="rounded-md border border-border bg-card">
+      <h2 className="border-b border-border px-5 py-4 text-[16px] font-semibold">Add an admin</h2>
+      <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
+        <Field id="name" label="Name" errors={errors.name}>
+          <Input id="name" name="name" className={controlClass} required />
+        </Field>
+        <Field id="email" label="Email" errors={errors.email}>
+          <Input id="email" name="email" type="email" className={controlClass} required />
+        </Field>
+        <Field id="password" label="Password" hint="At least 8 characters." errors={errors.password}>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            minLength={8}
+            autoComplete="new-password"
+            className={controlClass}
+            required
+          />
+        </Field>
+        <div className="flex items-end md:col-span-2">
+          <SubmitButton pendingText="Adding…" className="h-9 rounded-md px-4 text-sm">
+            Add admin
+          </SubmitButton>
+        </div>
+      </form>
+    </section>
   );
 }

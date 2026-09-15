@@ -6,13 +6,13 @@ import { deleteShipmentAction, regenerateShareTokenAction, updateShipmentAction 
 import { addEventAction, deleteEventAction } from "@/actions/events";
 import { StatusBadge } from "@/components/tracking/status-badge";
 import { ShipmentForm } from "@/components/admin/shipment-form";
-import { EventForm } from "@/components/admin/event-form";
+import { EventDrawer } from "@/components/admin/event-drawer";
+import { RouteStrip } from "@/components/admin/route-strip";
 import { AdminEventList } from "@/components/admin/admin-event-list";
 import { CopyButton } from "@/components/admin/copy-button";
 import { DeleteShipmentButton } from "@/components/admin/delete-shipment-button";
 import { ActionForm } from "@/components/admin/action-form";
 import { SubmitButton } from "@/components/admin/submit-button";
-import { Separator } from "@/components/ui/separator";
 
 async function baseUrl() {
   const h = await headers();
@@ -33,35 +33,60 @@ export default async function ShipmentDetailPage(props: PageProps<"/admin/shipme
   const formShipment = { ...shipment, weightKg: shipment.weightKg?.toString() ?? null };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="font-mono text-lg font-semibold">{shipment.trackingNumber}</h1>
+    <div className="flex flex-col gap-5">
+      <section className="flex flex-col gap-4 rounded-md border border-border bg-card p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="font-mono text-[24px] font-semibold tracking-[-0.01em]">{shipment.trackingNumber}</h1>
           <StatusBadge status={shipment.status} />
         </div>
-        <div className="flex flex-wrap gap-2">
+
+        <RouteStrip
+          mode={shipment.mode}
+          originPort={shipment.originPort}
+          destinationPort={shipment.destinationPort}
+          etd={shipment.etd}
+          eta={shipment.eta}
+        />
+
+        <div className="flex flex-wrap items-center gap-2">
           <CopyButton value={shipment.trackingNumber} label="Tracking number" />
           <CopyButton value={trackUrl} label="Tracking link" />
           <CopyButton value={shareUrl} label="Share link" />
-          <ActionForm action={regenerateShareTokenAction.bind(null, shipment.id)} successMessage="Share link regenerated">
-            <SubmitButton variant="outline" size="sm" pendingText="…">Regenerate share link</SubmitButton>
+          <ActionForm
+            action={regenerateShareTokenAction.bind(null, shipment.id)}
+            successMessage="Share link regenerated"
+          >
+            <SubmitButton variant="outline" pendingText="Regenerating…" className="h-9 rounded-md px-3.5 text-sm">
+              Regenerate share link
+            </SubmitButton>
           </ActionForm>
-          <DeleteShipmentButton action={deleteShipmentAction.bind(null, shipment.id)} trackingNumber={shipment.trackingNumber} />
+          <div className="w-full sm:ml-auto sm:w-auto">
+            <DeleteShipmentButton
+              action={deleteShipmentAction.bind(null, shipment.id)}
+              trackingNumber={shipment.trackingNumber}
+            />
+          </div>
         </div>
-      </div>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold">Events</h2>
-        <EventForm action={addEventAction.bind(null, shipment.id)} />
-        <AdminEventList events={shipment.events} deleteAction={(eventId) => deleteEventAction.bind(null, shipment.id, eventId)} />
       </section>
 
-      <Separator />
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold">Details</h2>
-        <ShipmentForm action={updateShipmentAction.bind(null, shipment.id)} shipment={formShipment} submitLabel="Save changes" />
+      <section className="rounded-md border border-border bg-card">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
+          <h2 className="text-[16px] font-semibold">Events</h2>
+          <EventDrawer action={addEventAction.bind(null, shipment.id)} />
+        </div>
+        <div className="p-5">
+          <AdminEventList
+            events={shipment.events}
+            deleteAction={(eventId) => deleteEventAction.bind(null, shipment.id, eventId)}
+          />
+        </div>
       </section>
+
+      <ShipmentForm
+        action={updateShipmentAction.bind(null, shipment.id)}
+        shipment={formShipment}
+        submitLabel="Save changes"
+      />
     </div>
   );
 }
