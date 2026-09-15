@@ -33,6 +33,7 @@ export default async function AdminShipmentsPage(props: PageProps<"/admin">) {
         <h1 className="text-[28px] font-semibold tracking-[-0.01em]">Shipments</h1>
         <Button
           render={<Link href="/admin/shipments/new" />}
+          nativeButton={false}
           className="h-9 rounded-md px-4 text-sm"
         >
           New shipment
@@ -50,6 +51,7 @@ export default async function AdminShipmentsPage(props: PageProps<"/admin">) {
         <div className="flex justify-center">
           <Button
             render={<Link href={`/admin?${nextParams}`} />}
+            nativeButton={false}
             variant="outline"
             className="h-9 rounded-md px-4 text-sm"
           >

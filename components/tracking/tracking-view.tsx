@@ -2,7 +2,7 @@ import type { PublicShipment } from "@/lib/tracking/public";
 import { StatusBadge } from "@/components/tracking/status-badge";
 import { EventTimeline } from "@/components/tracking/event-timeline";
 import { TrackSearch } from "@/components/tracking/track-search";
-import { RouteStrip } from "@/components/admin/route-strip";
+import { RouteStrip } from "@/components/tracking/route-strip";
 
 function Fact({ label, value }: { label: string; value: string | number | null }) {
   return (

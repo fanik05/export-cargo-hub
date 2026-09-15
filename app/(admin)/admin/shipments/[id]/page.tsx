@@ -7,7 +7,7 @@ import { addEventAction, deleteEventAction } from "@/actions/events";
 import { StatusBadge } from "@/components/tracking/status-badge";
 import { ShipmentForm } from "@/components/admin/shipment-form";
 import { EventDrawer } from "@/components/admin/event-drawer";
-import { RouteStrip } from "@/components/admin/route-strip";
+import { RouteStrip } from "@/components/tracking/route-strip";
 import { AdminEventList } from "@/components/admin/admin-event-list";
 import { CopyButton } from "@/components/admin/copy-button";
 import { DeleteShipmentButton } from "@/components/admin/delete-shipment-button";
