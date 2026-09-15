@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ShipmentMode {
+  AIR
+  OCEAN
+}
+
+enum EventType {
+  BOOKED
+  CARGO_RECEIVED
+  DEPARTED_ORIGIN
+  IN_TRANSIT
+  ARRIVED_DESTINATION
+  CUSTOMS_CLEARED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  EXCEPTION
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Shipment {
+  id              String          @id @default(cuid())
+  trackingNumber  String          @unique
+  shareToken      String          @unique
+  mode            ShipmentMode
+  status          EventType       @default(BOOKED)
+  shipperName     String
+  consigneeName   String
+  originPort      String
+  destinationPort String
+  carrier         String?
+  masterRef       String?
+  etd             DateTime?
+  eta             DateTime?
+  pieces          Int?
+  weightKg        Decimal?        @db.Decimal(10, 2)
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  events          ShipmentEvent[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ShipmentEvent {
+  id         String    @id @default(cuid())
+  shipmentId String
+  shipment   Shipment  @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  type       EventType
+  occurredAt DateTime
+  location   String?
+  note       String?
+  createdAt  DateTime  @default(now())
+
+  @@index([shipmentId, occurredAt])
+}
+
+model TrackingSequence {
+  year Int @id
+  last Int @default(0)
+}
