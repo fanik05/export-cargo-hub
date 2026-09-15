@@ -2,10 +2,10 @@
 
 A B2B export shipment & documentation platform for air and ocean freight logistics.
 
-> **Status: early scaffold.** The Next.js app, Tailwind/shadcn theming, and the
-> Prisma/Postgres dependencies are wired up, but the domain features (shipments,
-> documents, tracking) have not been built yet. `app/page.tsx` is still the
-> starter page. See [Current state](#current-state) for exactly what exists.
+> **Status: v1 shipment tracking is implemented.** There are three surfaces:
+> a public tracking page (by tracking number or by share link), a public JSON
+> tracking endpoint, and an admin app for managing shipments, events, and
+> other admin users. See [Current state](#current-state) for details.
 
 ## Tech stack
 
@@ -17,9 +17,12 @@ A B2B export shipment & documentation platform for air and ocean freight logisti
 | Icons | Phosphor Icons (`@phosphor-icons/react`) |
 | Primitives | Base UI (`@base-ui/react`) |
 | Database | PostgreSQL via Prisma ORM with the `pg` driver adapter |
-| Client state | Zustand *(planned — not yet installed)* |
-| Data grids | TanStack Table *(planned — not yet installed)* |
-| Validation | Zod for every mutation and API ingress *(planned — not yet installed)* |
+| Validation | Zod for every mutation and API ingress |
+| Testing | Vitest (unit tests always run; integration tests need a test database) |
+
+Zustand and TanStack Table were named in the original architecture notes but
+are **not used in v1** — there's no client-side grid state that needs them
+yet.
 
 ## Prerequisites
 
@@ -31,27 +34,27 @@ A B2B export shipment & documentation platform for air and ocean freight logisti
 
 ```bash
 npm install
+cp .env.example .env
 ```
 
-Create a `.env` in the repo root (it is gitignored — never commit it):
+Fill in `.env`:
+
+- `DATABASE_URL` — your Postgres connection string
+- `SESSION_SECRET` — 32+ random bytes, e.g. `openssl rand -base64 48`
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` — the first admin account,
+  created by the seed script
+
+Then generate the Prisma client, push the schema, and seed the first admin:
 
 ```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/export_cargo_hub"
-```
-
-Once a Prisma schema exists, sync it to the database:
-
-```bash
-npx prisma db push
-```
-
-Then start the dev server:
-
-```bash
+npm run db:generate
+npm run db:push
+npm run db:seed
 npm run dev
 ```
 
-The app runs at http://localhost:3000.
+The app runs at http://localhost:3000. Sign in at `/login` with the
+`ADMIN_*` credentials from `.env`.
 
 ## Scripts
 
@@ -61,28 +64,94 @@ The app runs at http://localhost:3000.
 | `npm run build` | Production build |
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint (`eslint-config-next`) |
-| `npx prisma db push` | Push schema changes to the database |
+| `npm test` | Run the Vitest suite (`vitest run`) |
+| `npm run db:push` | Push the Prisma schema to the database |
+| `npm run db:generate` | Regenerate the Prisma client into `lib/generated/prisma` |
+| `npm run db:seed` | Seed the first admin user (`prisma/seed.ts`) |
 | `npx prisma studio` | Open the database visualizer |
+
+### Enabling integration tests
+
+Unit tests (`tests/unit/`) always run. Integration tests (`tests/integration/`)
+talk to a real database and are skipped unless `TEST_DATABASE_URL` is set in
+`.env`. To enable them, point it at a disposable database (its tables get
+truncated between tests) and push the schema to it once:
+
+```bash
+DATABASE_URL="$TEST_DATABASE_URL" npx prisma db push
+```
+
+After that, `npm test` will exercise the integration suites too.
 
 ## Project structure
 
 ```
-app/                  App Router routes, layouts, and global styles
-  layout.tsx          Root layout: fonts (Geist, JetBrains Mono) + globals.css
-  globals.css         Tailwind v4 entry, shadcn theme tokens, dark variant
-  page.tsx            Landing page (still the create-next-app starter)
-components/ui/        shadcn primitives (currently: button)
-lib/utils.ts          Shared helpers (re-exports `cn`)
-public/               Static assets
-AGENTS.md             Conventions for AI coding agents (also loaded as CLAUDE.md)
+app/                          App Router routes, layouts, and global styles
+  (public)/                   Public route group: landing page, tracking pages
+    page.tsx                  Landing page — enter a tracking number
+    track/[trackingNumber]/   Tracking page by tracking number
+    t/[shareToken]/           Tracking page by share link
+  (admin)/admin/              Admin route group (session-gated)
+    page.tsx                  Shipment list
+    shipments/new/            Create a shipment
+    shipments/[id]/           Shipment detail: edit, events, share link, delete
+    users/                    Manage admin users
+    error.tsx                 Admin-scoped error boundary
+  api/track/[trackingNumber]/ Public JSON tracking endpoint
+  login/                      Admin sign-in
+  error.tsx                   Root error boundary
+  layout.tsx                  Root layout: fonts + globals.css
+  globals.css                 Tailwind v4 entry, shadcn theme tokens, dark variant
+actions/                      Server Actions (auth, shipments, events, users) — Zod-validated
+components/
+  ui/                         shadcn primitives
+  admin/                      Admin forms, tables, and controls
+  tracking/                   Public tracking UI (status badge, timeline, search)
+lib/
+  prisma.ts                   Prisma client singleton (never `new PrismaClient()` elsewhere)
+  session.ts                  JWT session cookie helpers
+  dal.ts                      Data-access-layer guards (require an authenticated admin)
+  auth/credentials.ts         Password hashing/verification
+  shipments/                  Shipment + event services, cache revalidation
+  tracking/                   Tracking number/share token generation, status derivation, public shape
+  validation/                 Zod schemas for auth, shipment, event, user, and generic forms
+  generated/prisma/           Generated Prisma client (gitignored, rebuilt by `db:generate`)
+prisma/
+  schema.prisma               Data model
+  seed.ts                     Seeds the first admin user
+public/                       Static assets
+tests/
+  unit/                       Pure-function tests (always run)
+  integration/                Service-layer tests against a real database (need `TEST_DATABASE_URL`)
+AGENTS.md                     Conventions for AI coding agents (also loaded as CLAUDE.md)
 ```
 
 Imports use the `@/*` alias, which maps to the **repo root** — so
-`@/components/ui/button`, `@/lib/utils`. There is no `src/` directory.
+`@/components/ui/button`, `@/lib/prisma`. There is no `src/` directory.
 
-Directories that the conventions assume but that do not exist yet:
-`actions/` (Server Actions), `app/api/` (Route Handlers), `prisma/schema.prisma`,
-and `lib/prisma.ts` (the Prisma client singleton).
+## Routes
+
+| Route | What it is |
+| --- | --- |
+| `/` | Public landing page — enter a tracking number |
+| `/track/[trackingNumber]` | Public tracking page, looked up by tracking number |
+| `/t/[shareToken]` | Public tracking page, looked up by share link |
+| `/api/track/[trackingNumber]` | Public JSON tracking endpoint (allow-listed fields only) |
+| `/login` | Admin sign-in |
+| `/admin` | Admin shipment list |
+| `/admin/shipments/new` | Create a shipment |
+| `/admin/shipments/[id]` | Shipment detail — edit header, add/delete events, regenerate share link, delete |
+| `/admin/users` | Manage admin users |
+
+## Data model
+
+A shipment's `status` is derived from its latest event (`occurredAt`, then
+`createdAt` as a tiebreaker) and cached on the `Shipment` row so list/detail
+views don't need to recompute it on every read; the cache is refreshed
+whenever events change. Tracking numbers are generated in the form
+`ECH-YYYY-NNNNN` (year plus a zero-padded per-year sequence). Share tokens are
+32 random bytes (base64url-encoded) and can be regenerated from the shipment
+detail page, which invalidates the old link.
 
 ## Conventions
 
@@ -102,22 +171,26 @@ contributing:
 6. **No Pages Router**, no DB access from client components, and no styling
    libraries outside Tailwind.
 
+## A note on the Prisma version
+
+`prisma` and `@prisma/client` are pinned to `7.10.0` rather than floating to
+the latest major. The `prisma` package on npm moved to a `8.x` line that is
+the new Prisma Platform CLI beta — a different workflow (platform-managed
+projects) — not a newer release of the ORM CLI this project uses. Pinning
+avoids accidentally picking that up in a fresh install.
+
 ## Current state
 
 Present and working:
 
-- Next.js 16 App Router skeleton with the root layout, fonts, and Tailwind v4
-- shadcn/ui configured (`components.json`) with the Button primitive installed
-- Prisma 8 CLI, `@prisma/client`, and the `@prisma/adapter-pg` driver adapter as
-  dependencies
+- Public tracking by tracking number (`/track/[trackingNumber]`) and by share
+  link (`/t/[shareToken]`), backed by a public JSON endpoint
+  (`/api/track/[trackingNumber]`) that only ever returns an allow-listed shape
+- Admin: session-gated (JWT cookie) sign-in, shipment list/create/edit/delete,
+  event add/delete, share-link regeneration, and admin user management
+- Prisma schema, generated client, and seed script
+- Root and admin-scoped error boundaries
+- Unit and integration test suites (Vitest)
 
-Not built yet:
-
-- Prisma schema and migrations — no data model exists
-- The Prisma client singleton at `lib/prisma.ts`
-- Any shipment, document, or tracking feature, route, or Server Action
-- Zustand, TanStack Table, and Zod are named in the architecture but are not
-  installed
-
-Suggested first steps: define `prisma/schema.prisma`, add the `lib/prisma.ts`
-singleton using the `pg` adapter, then build the first shipment route.
+Not part of v1: document generation/storage, carrier integrations, and any
+client-side data grid (Zustand/TanStack Table are not used).

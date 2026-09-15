@@ -1,6 +1,8 @@
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
+const dirname = import.meta.dirname;
+
 export default defineConfig({
   test: {
     environment: "node",
@@ -10,8 +12,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "server-only": path.resolve(__dirname, "tests/mocks/server-only.ts"),
-      "@": path.resolve(__dirname, "."),
+      "server-only": path.resolve(dirname, "tests/mocks/server-only.ts"),
+      "@": path.resolve(dirname, "."),
     },
   },
 });
