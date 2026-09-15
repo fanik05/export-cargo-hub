@@ -7,6 +7,7 @@ import {
   deriveStatus,
   formatTrackingNumber,
   normalizeTrackingNumber,
+  safeDecode,
 } from "@/lib/tracking/status";
 
 const d = (iso: string) => new Date(iso);
@@ -49,6 +50,20 @@ describe("tracking numbers", () => {
     expect(TRACKING_NUMBER_RE.test("ECH-2026-00042")).toBe(true);
     expect(TRACKING_NUMBER_RE.test("ECH-26-42")).toBe(false);
     expect(TRACKING_NUMBER_RE.test("hello")).toBe(false);
+  });
+});
+
+describe("safeDecode", () => {
+  it("decodes well-formed input", () => {
+    expect(safeDecode("ECH-2026-00042")).toBe("ECH-2026-00042");
+  });
+
+  it("returns the raw input instead of throwing on malformed escapes", () => {
+    expect(safeDecode("%E0%A4%A")).toBe("%E0%A4%A");
+  });
+
+  it("decodes percent-encoded characters", () => {
+    expect(safeDecode("ech%2D2026")).toBe("ech-2026");
   });
 });
 

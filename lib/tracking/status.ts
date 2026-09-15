@@ -65,3 +65,12 @@ export function formatTrackingNumber(year: number, seq: number): string {
 export function normalizeTrackingNumber(input: string): string {
   return input.trim().toUpperCase();
 }
+
+/** decodeURIComponent that returns the raw input instead of throwing on malformed escapes. */
+export function safeDecode(input: string): string {
+  try {
+    return decodeURIComponent(input);
+  } catch {
+    return input;
+  }
+}

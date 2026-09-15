@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { findPublicShipmentByTrackingNumber } from "@/lib/tracking/queries";
-import { normalizeTrackingNumber } from "@/lib/tracking/status";
+import { normalizeTrackingNumber, safeDecode } from "@/lib/tracking/status";
 import { TrackingView } from "@/components/tracking/tracking-view";
 import { TrackSearch } from "@/components/tracking/track-search";
 
 export async function generateMetadata(props: PageProps<"/track/[trackingNumber]">): Promise<Metadata> {
   const { trackingNumber } = await props.params;
-  return { title: `${normalizeTrackingNumber(decodeURIComponent(trackingNumber))} · Export Cargo Hub` };
+  return { title: `${normalizeTrackingNumber(safeDecode(trackingNumber))} · Export Cargo Hub` };
 }
 
 export default async function TrackPage(props: PageProps<"/track/[trackingNumber]">) {
   const { trackingNumber } = await props.params;
-  const input = decodeURIComponent(trackingNumber);
+  const input = safeDecode(trackingNumber);
   const shipment = await findPublicShipmentByTrackingNumber(input);
 
   if (!shipment) {
