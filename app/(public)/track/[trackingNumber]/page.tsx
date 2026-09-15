@@ -7,7 +7,7 @@ import { TrackSearch } from "@/components/tracking/track-search";
 export async function generateMetadata(props: PageProps<"/track/[trackingNumber]">): Promise<Metadata> {
   const { trackingNumber } = await props.params;
   return {
-    title: `${normalizeTrackingNumber(safeDecode(trackingNumber))} · Export Cargo Hub`,
+    title: `Tracking ${normalizeTrackingNumber(safeDecode(trackingNumber))}`,
     robots: { index: false },
   };
 }
@@ -19,14 +19,15 @@ export default async function TrackPage(props: PageProps<"/track/[trackingNumber
 
   if (!shipment) {
     return (
-      <div className="flex w-full max-w-lg flex-col items-center gap-6 pt-10 text-center">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-semibold">No shipment found</h1>
-          <p className="text-sm text-muted-foreground">
-            Nothing matches <span className="font-mono">{normalizeTrackingNumber(input)}</span>. Check the number and try again.
+      <div className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6">
+        <div className="rounded-md border border-border bg-card p-6">
+          <h1 className="text-[20px] font-semibold">No shipment found</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Nothing matches <span className="font-mono">{normalizeTrackingNumber(input)}</span>. Check the
+            number and try again.
           </p>
+          <TrackSearch defaultValue={normalizeTrackingNumber(input)} className="mt-5" autoFocus />
         </div>
-        <TrackSearch defaultValue={normalizeTrackingNumber(input)} />
       </div>
     );
   }

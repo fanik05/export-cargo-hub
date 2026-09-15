@@ -2,12 +2,14 @@ import { TrackSearch } from "@/components/tracking/track-search";
 
 export default function HomePage() {
   return (
-    <div className="flex w-full max-w-lg flex-col items-center gap-6 pt-16 text-center">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Track your shipment</h1>
-        <p className="text-sm text-muted-foreground">Enter the tracking number from your booking confirmation.</p>
+    <section className="bg-navy text-white">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-12 sm:px-6">
+        <h1 className="text-[28px] font-semibold tracking-[-0.01em]">Track a shipment</h1>
+        <p className="mt-1 text-sm text-white/70">
+          Enter the tracking number from your booking confirmation.
+        </p>
+        <TrackSearch className="mt-6" autoFocus />
       </div>
-      <TrackSearch />
-    </div>
+    </section>
   );
 }

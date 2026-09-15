@@ -3,7 +3,7 @@ import { findPublicShipmentByToken } from "@/lib/tracking/queries";
 import { TrackingView } from "@/components/tracking/tracking-view";
 import { TrackSearch } from "@/components/tracking/track-search";
 
-export const metadata: Metadata = { title: "Shipment · Export Cargo Hub", robots: { index: false } };
+export const metadata: Metadata = { title: "Shipment tracking", robots: { index: false } };
 
 export default async function SharePage(props: PageProps<"/t/[shareToken]">) {
   const { shareToken } = await props.params;
@@ -11,12 +11,14 @@ export default async function SharePage(props: PageProps<"/t/[shareToken]">) {
 
   if (!shipment) {
     return (
-      <div className="flex w-full max-w-lg flex-col items-center gap-6 pt-10 text-center">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-semibold">This link is no longer valid</h1>
-          <p className="text-sm text-muted-foreground">The share link may have been regenerated. Ask the sender for a new one, or track by number.</p>
+      <div className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6">
+        <div className="rounded-md border border-border bg-card p-6">
+          <h1 className="text-[20px] font-semibold">This link is no longer valid</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The share link may have been regenerated. Ask the sender for a new one, or track by number.
+          </p>
+          <TrackSearch className="mt-5" autoFocus />
         </div>
-        <TrackSearch />
       </div>
     );
   }
