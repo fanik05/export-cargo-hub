@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { createUser, deleteUser, listUsers } from "@/lib/users/service";
 import { verifyCredentials } from "@/lib/auth/credentials";
@@ -20,6 +20,18 @@ describe.skipIf(!hasTestDb)("user service", () => {
     const r = await createUser({ name: "Ops 2", email: "ops@example.com", password: "longenough" });
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.fieldErrors.email?.[0]).toMatch(/already/i);
+  });
+
+  it("maps a unique-constraint violation from a racing create to the same field error", async () => {
+    await createUser({ name: "Ops", email: "race@example.com", password: "longenough" });
+    vi.spyOn(prisma.user, "findUnique").mockResolvedValueOnce(null);
+    try {
+      const r = await createUser({ name: "Ops 2", email: "race@example.com", password: "longenough" });
+      expect(r.ok).toBe(false);
+      if (!r.ok) expect(r.fieldErrors.email?.[0]).toMatch(/already/i);
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 
   it("refuses to delete yourself but deletes others", async () => {
