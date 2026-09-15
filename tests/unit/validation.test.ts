@@ -48,6 +48,14 @@ describe("shipmentSchema", () => {
     expect(r.fieldErrors.pieces?.[0]).toBeTruthy();
     expect(r.fieldErrors.mode?.[0]).toBeTruthy();
   });
+
+  it("rejects pieces/weightKg above their upper bounds", () => {
+    const r = parseForm(shipmentSchema, fd({ ...valid, pieces: "3000000000", weightKg: "99999999999" }));
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.fieldErrors.pieces?.[0]).toBeTruthy();
+    expect(r.fieldErrors.weightKg?.[0]).toBeTruthy();
+  });
 });
 
 describe("eventSchema", () => {
@@ -71,6 +79,13 @@ describe("eventSchema", () => {
   it("rejects an unparseable date", () => {
     const r = parseForm(eventSchema, fd({ type: "BOOKED", occurredAt: "not-a-date" }));
     expect(r.ok).toBe(false);
+  });
+
+  it("parses a datetime-local value as UTC regardless of server-local timezone", () => {
+    const r = parseForm(eventSchema, fd({ type: "BOOKED", occurredAt: "2026-09-15T10:30", location: "", note: "" }));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.data.occurredAt.toISOString()).toBe("2026-09-15T10:30:00.000Z");
   });
 });
 
@@ -101,6 +116,17 @@ describe("loginSchema", () => {
     expect(b.ok && b.data.next).toBe("/admin");
     const c = parseForm(loginSchema, fd({ email: "a@b.co", password: "x", next: "https://evil.com" }));
     expect(c.ok && c.data.next).toBe("/admin");
+  });
+
+  it("rejects backslash-based open-redirect payloads", () => {
+    const d = parseForm(loginSchema, fd({ email: "a@b.co", password: "x", next: "/\\evil.com" }));
+    expect(d.ok && d.data.next).toBe("/admin");
+    const e = parseForm(loginSchema, fd({ email: "a@b.co", password: "x", next: "/\\/evil.com" }));
+    expect(e.ok && e.data.next).toBe("/admin");
+    const f = parseForm(loginSchema, fd({ email: "a@b.co", password: "x", next: "\\/evil.com" }));
+    expect(f.ok && f.data.next).toBe("/admin");
+    const g = parseForm(loginSchema, fd({ email: "a@b.co", password: "x", next: "/admin/users" }));
+    expect(g.ok && g.data.next).toBe("/admin/users");
   });
 
   it("trims and lowercases padded email before validation", () => {

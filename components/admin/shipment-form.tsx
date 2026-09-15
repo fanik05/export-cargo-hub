@@ -71,10 +71,10 @@ export function ShipmentForm({ action, shipment, submitLabel }: Props) {
         <Input id="eta" name="eta" type="date" defaultValue={toDateInputValue(shipment?.eta ?? null)} />
       </Field>
       <Field id="pieces" label="Pieces" errors={errors.pieces}>
-        <Input id="pieces" name="pieces" type="number" min={0} step={1} defaultValue={shipment?.pieces ?? ""} />
+        <Input id="pieces" name="pieces" type="number" min={0} max={2_147_483_647} step={1} defaultValue={shipment?.pieces ?? ""} />
       </Field>
       <Field id="weightKg" label="Weight (kg)" errors={errors.weightKg}>
-        <Input id="weightKg" name="weightKg" type="number" min={0} step="0.01" defaultValue={shipment?.weightKg ?? ""} />
+        <Input id="weightKg" name="weightKg" type="number" min={0} max={99_999_999.99} step="0.01" defaultValue={shipment?.weightKg ?? ""} />
       </Field>
       <div className="md:col-span-2">
         <Field id="notes" label="Internal notes (never shown publicly)" errors={errors.notes}>

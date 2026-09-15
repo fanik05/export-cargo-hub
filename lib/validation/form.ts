@@ -35,13 +35,18 @@ export const optionalText = z
   .trim()
   .transform((s) => (s === "" ? null : s));
 
+/** A naked "YYYY-MM-DDTHH:mm[:ss]" (datetime-local) is UTC wall-clock, not server-local. */
+function asUtcIso(s: string): string {
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(s) ? `${s}Z` : s;
+}
+
 /** "" -> null, otherwise a Date. Accepts "YYYY-MM-DD" and "YYYY-MM-DDTHH:mm". */
 export const optionalDate = z
   .string()
   .trim()
   .transform((s, ctx) => {
     if (s === "") return null;
-    const d = new Date(s);
+    const d = new Date(asUtcIso(s));
     if (Number.isNaN(d.getTime())) {
       ctx.addIssue({ code: "custom", message: "Enter a valid date" });
       return z.NEVER;
@@ -54,7 +59,7 @@ export const requiredDate = z
   .trim()
   .min(1, "Required")
   .transform((s, ctx) => {
-    const d = new Date(s);
+    const d = new Date(asUtcIso(s));
     if (Number.isNaN(d.getTime())) {
       ctx.addIssue({ code: "custom", message: "Enter a valid date" });
       return z.NEVER;
@@ -63,14 +68,19 @@ export const requiredDate = z
   });
 
 /** "" -> null, otherwise a number. */
-export function optionalNumber(opts: { int?: boolean; min?: number } = {}) {
+export function optionalNumber(opts: { int?: boolean; min?: number; max?: number } = {}) {
   return z
     .string()
     .trim()
     .transform((s, ctx) => {
       if (s === "") return null;
       const n = Number(s);
-      if (Number.isNaN(n) || (opts.int && !Number.isInteger(n)) || (opts.min !== undefined && n < opts.min)) {
+      if (
+        Number.isNaN(n) ||
+        (opts.int && !Number.isInteger(n)) ||
+        (opts.min !== undefined && n < opts.min) ||
+        (opts.max !== undefined && n > opts.max)
+      ) {
         ctx.addIssue({ code: "custom", message: "Enter a valid number" });
         return z.NEVER;
       }

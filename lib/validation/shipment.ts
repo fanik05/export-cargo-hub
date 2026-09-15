@@ -11,8 +11,8 @@ export const shipmentSchema = z.object({
   masterRef: optionalText,
   etd: optionalDate,
   eta: optionalDate,
-  pieces: optionalNumber({ int: true, min: 0 }),
-  weightKg: optionalNumber({ min: 0 }),
+  pieces: optionalNumber({ int: true, min: 0, max: 2_147_483_647 }),
+  weightKg: optionalNumber({ min: 0, max: 99_999_999.99 }),
   notes: optionalText,
 });
 
