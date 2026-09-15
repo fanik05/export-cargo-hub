@@ -85,6 +85,12 @@ describe("createUserSchema", () => {
     expect(bad.fieldErrors.email).toBeTruthy();
     expect(bad.fieldErrors.password).toBeTruthy();
   });
+
+  it("trims and lowercases padded email before validation", () => {
+    const r = parseForm(createUserSchema, fd({ name: "Ops", email: "  OPS@Example.com  ", password: "longenough" }));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.data.email).toBe("ops@example.com");
+  });
 });
 
 describe("loginSchema", () => {
@@ -95,5 +101,11 @@ describe("loginSchema", () => {
     expect(b.ok && b.data.next).toBe("/admin");
     const c = parseForm(loginSchema, fd({ email: "a@b.co", password: "x", next: "https://evil.com" }));
     expect(c.ok && c.data.next).toBe("/admin");
+  });
+
+  it("trims and lowercases padded email before validation", () => {
+    const r = parseForm(loginSchema, fd({ email: "  OPS@Example.com  ", password: "x", next: "" }));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.data.email).toBe("ops@example.com");
   });
 });

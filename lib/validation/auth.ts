@@ -6,7 +6,7 @@ const safeNext = z
   .transform((v) => (v && v.startsWith("/") && !v.startsWith("//") ? v : "/admin"));
 
 export const loginSchema = z.object({
-  email: z.email("Enter a valid email").trim().toLowerCase(),
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
   password: z.string().min(1, "Required"),
   next: safeNext,
 });
