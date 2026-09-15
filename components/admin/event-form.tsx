@@ -14,10 +14,23 @@ export function EventForm({ action }: { action: (prev: ActionResult, formData: F
   const [state, formAction] = useActionState(action, INITIAL_ACTION_STATE);
   const formRef = useRef<HTMLFormElement>(null);
   const errors = !state.ok ? state.fieldErrors ?? {} : {};
+
+  const fillNow = () => {
+    const el = formRef.current?.elements.namedItem("occurredAt");
+    if (el instanceof HTMLInputElement) el.value = toDateTimeInputValue(new Date());
+  };
+
+  useEffect(() => {
+    fillNow();
+  }, []);
+
   useEffect(() => {
     if (state.ok) {
       toast.success("Event added");
       formRef.current?.reset();
+      fillNow();
+    } else if (state.message) {
+      toast.error(state.message);
     }
   }, [state]);
 
@@ -34,7 +47,7 @@ export function EventForm({ action }: { action: (prev: ActionResult, formData: F
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="occurredAt">When (UTC)</Label>
-        <Input id="occurredAt" name="occurredAt" type="datetime-local" defaultValue={toDateTimeInputValue(new Date())} required />
+        <Input id="occurredAt" name="occurredAt" type="datetime-local" defaultValue="" required />
         <FieldError errors={errors.occurredAt} />
       </div>
       <div className="flex flex-col gap-1.5">
