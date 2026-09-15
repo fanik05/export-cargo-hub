@@ -62,18 +62,19 @@ export async function createShipment(input: ShipmentInput): Promise<{ id: string
   }
 }
 
-export async function updateShipment(id: string, input: ShipmentInput): Promise<void> {
-  await prisma.shipment.update({ where: { id }, data: headerData(input) });
+export async function updateShipment(id: string, input: ShipmentInput): Promise<boolean> {
+  const result = await prisma.shipment.updateMany({ where: { id }, data: headerData(input) });
+  return result.count > 0;
 }
 
 export async function deleteShipment(id: string): Promise<void> {
-  await prisma.shipment.delete({ where: { id } });
+  await prisma.shipment.deleteMany({ where: { id } });
 }
 
-export async function regenerateShareToken(id: string): Promise<string> {
+export async function regenerateShareToken(id: string): Promise<string | null> {
   const shareToken = generateShareToken();
-  await prisma.shipment.update({ where: { id }, data: { shareToken } });
-  return shareToken;
+  const result = await prisma.shipment.updateMany({ where: { id }, data: { shareToken } });
+  return result.count > 0 ? shareToken : null;
 }
 
 export async function getShipmentById(id: string): Promise<ShipmentWithEvents | null> {

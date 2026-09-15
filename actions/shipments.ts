@@ -21,7 +21,8 @@ export async function updateShipmentAction(id: string, _prev: ActionResult, form
   await requireAdmin();
   const parsed = parseForm(shipmentSchema, formData);
   if (!parsed.ok) return { ok: false, fieldErrors: parsed.fieldErrors };
-  await shipments.updateShipment(id, parsed.data);
+  const updated = await shipments.updateShipment(id, parsed.data);
+  if (!updated) return { ok: false, message: "Shipment not found" };
   revalidateShipment(id);
   return { ok: true };
 }
@@ -29,13 +30,14 @@ export async function updateShipmentAction(id: string, _prev: ActionResult, form
 export async function deleteShipmentAction(id: string): Promise<void> {
   await requireAdmin();
   await shipments.deleteShipment(id);
-  revalidatePath("/admin");
+  revalidateShipment(id);
   redirect("/admin");
 }
 
 export async function regenerateShareTokenAction(id: string, _prev: ActionResult, _formData: FormData): Promise<ActionResult> {
   await requireAdmin();
-  await shipments.regenerateShareToken(id);
+  const token = await shipments.regenerateShareToken(id);
+  if (!token) return { ok: false, message: "Shipment not found" };
   revalidateShipment(id);
   return { ok: true };
 }

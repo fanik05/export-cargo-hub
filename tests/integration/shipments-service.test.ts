@@ -71,6 +71,18 @@ describe.skipIf(!hasTestDb)("shipment service", () => {
     expect(await prisma.shipmentEvent.count()).toBe(0);
   });
 
+  it("returns false updating a shipment that does not exist", async () => {
+    expect(await updateShipment("nope", base)).toBe(false);
+  });
+
+  it("returns null regenerating the share token for a shipment that does not exist", async () => {
+    expect(await regenerateShareToken("nope")).toBeNull();
+  });
+
+  it("resolves without throwing deleting a shipment that does not exist", async () => {
+    await expect(deleteShipment("nope")).resolves.toBeUndefined();
+  });
+
   it("lists with search, status filter, and paging", async () => {
     for (let i = 0; i < 3; i++) await createShipment({ ...base, shipperName: `Shipper ${i}` });
     const { id } = await createShipment({ ...base, shipperName: "Zeta", masterRef: "MAWB-777" });
