@@ -29,7 +29,7 @@ export default async function UsersPage() {
           </TableHeader>
           <TableBody>
             {users.map((u) => (
-              <TableRow key={u.id} className="border-b-0 odd:bg-white even:bg-[#FAFBFC] hover:bg-amber-soft/40">
+              <TableRow key={u.id} className="border-b-0 odd:bg-card even:bg-muted/40 hover:bg-amber-soft/40">
                 <TableCell className={cellClass}>
                   {u.name}
                   {u.id === me.id ? " (you)" : ""}

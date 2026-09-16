@@ -5,9 +5,8 @@ import { cn } from "@/lib/utils";
 const toneClass: Record<StatusTone, string> = {
   neutral: "bg-muted text-foreground",
   info: "bg-transit-soft text-transit",
-  // Darker greens/ambers than the raw tokens so 12px text clears 4.5:1 on the soft fills.
-  success: "bg-success-soft text-[#15803D]",
-  warning: "bg-amber-soft text-[#92400E]",
+  success: "bg-success-soft text-success-strong",
+  warning: "bg-amber-soft text-warning-strong",
 };
 
 export function StatusBadge({ status, className }: { status: EventType; className?: string }) {

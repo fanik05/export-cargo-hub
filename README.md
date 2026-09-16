@@ -117,12 +117,16 @@ src/
     login/                    Admin sign-in
     error.tsx                 Root error boundary
     layout.tsx                Root layout: fonts + globals.css
-    globals.css               Tailwind v4 entry and design tokens
+    globals.css               Tailwind v4 entry and design tokens for both themes
+    icon.svg                  Favicon
   actions/                    Server Actions (auth, shipments, events, users) — Zod-validated
   components/
     ui/                       shadcn primitives
     admin/                    Admin forms, tables, drawers, sidebar
     tracking/                 Tracking UI shared by public and admin (status badge, route strip, timeline)
+    brand/logo.tsx            Logo mark and wordmark (matches app/icon.svg)
+    theme-provider.tsx        next-themes provider; writes the theme class on <html>
+    theme-toggle.tsx          Light/dark switch used in both shells
   lib/
     prisma.ts                 Prisma client singleton (never `new PrismaClient()` elsewhere)
     session.ts                JWT session cookie helpers

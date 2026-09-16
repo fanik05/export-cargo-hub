@@ -37,6 +37,8 @@ src/lib/              everything that is not UI: prisma.ts, session.ts, dal.ts, 
 src/components/ui/    shadcn primitives (registry-owned)
 src/components/admin/ admin forms, tables, drawers, sidebar
 src/components/tracking/ pieces shared by public and admin views (status badge, route strip, timeline)
+src/components/brand/  logo mark and wordmark
+src/components/        theme-provider.tsx and theme-toggle.tsx sit at the root of components/
 src/proxy.ts          redirects unauthenticated /admin/* to /login?next=…
 prisma/               schema.prisma, seed.ts
 tests/unit/           pure-function tests, always run
@@ -83,12 +85,18 @@ split a file rather than let it grow.
     text; JetBrains Mono only for reference values (tracking numbers, AWB/BL). Content sits in
     cards: `rounded-md border border-border bg-card`. Form controls use `Field` and
     `controlClass` from `src/components/admin/form-field.tsx`. Side panels are the shadcn `Sheet`
-    drawer. Status is always shown with `StatusBadge`; routes with `RouteStrip`.
+    drawer. Status is always shown with `StatusBadge`; routes with `RouteStrip`. The brand mark
+    and wordmark come from `src/components/brand/logo.tsx` — pass `tone="inverse"` on a navy
+    surface. The favicon is `src/app/icon.svg` and must stay in step with that mark.
 11. **Copy.** Sentence case everywhere, no all-caps labels, no middle dots, no `→` in text (use
     an icon). A button names the action and its toast mirrors it ("Save changes" → "Changes
     saved"). Errors say what happened and what to do, without apologising.
-12. **Dark mode is out of scope.** The `.dark` block in `globals.css` is stale and there is no
-    theme toggle; do not add one without redoing that palette.
+12. **Both themes are supported.** `next-themes` writes `class="dark"` on `<html>`; the palette
+    lives in the `.dark` block of `globals.css` and is navy-based, with amber taking over as
+    `--primary` because navy would vanish on a navy page. Never hardcode a hex in a component:
+    add a token to both blocks instead. `color-scheme` is set per theme so native selects and
+    date inputs follow. The exception is text on an always-amber or always-navy surface, which
+    is correct in both themes. New surfaces must be checked in light and dark before merging.
 13. **Tests.** Unit tests for pure logic, integration tests for services against a real
     database. Integration suites `TRUNCATE` tables, so `TEST_DATABASE_URL` must never point at the
     main database. Test and hook timeouts are 60 s because the database is remote.

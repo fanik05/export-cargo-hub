@@ -43,7 +43,7 @@ export function ShipmentTable({ rows }: { rows: ShipmentRow[] }) {
           return (
             <TableRow
               key={s.id}
-              className="border-b-0 odd:bg-white even:bg-[#FAFBFC] hover:bg-amber-soft/40"
+              className="border-b-0 odd:bg-card even:bg-muted/40 hover:bg-amber-soft/40"
             >
               <TableCell className={cellClass}>
                 <ShipmentPreviewDrawer row={s} />

@@ -19,8 +19,8 @@ export default async function TrackPage(props: PageProps<"/track/[trackingNumber
 
   if (!shipment) {
     return (
-      <div className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6">
-        <div className="rounded-md border border-border bg-card p-6">
+      <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+        <div className="w-full max-w-lg rounded-md border border-border bg-card p-6">
           <h1 className="text-[20px] font-semibold">No shipment found</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Nothing matches <span className="font-mono">{normalizeTrackingNumber(input)}</span>. Check the
