@@ -13,6 +13,7 @@ import { CopyButton } from "@/components/admin/copy-button";
 import { DeleteShipmentButton } from "@/components/admin/delete-shipment-button";
 import { ActionForm } from "@/components/admin/action-form";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { BackLink } from "@/components/admin/back-link";
 
 async function baseUrl() {
   const h = await headers();
@@ -34,6 +35,7 @@ export default async function ShipmentDetailPage(props: PageProps<"/admin/shipme
 
   return (
     <div className="flex flex-col gap-5">
+      <BackLink href="/admin">Back to shipments</BackLink>
       <section className="flex flex-col gap-4 rounded-md border border-border bg-card p-5">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="font-mono text-[24px] font-semibold tracking-[-0.01em]">{shipment.trackingNumber}</h1>
