@@ -11,8 +11,8 @@ export default async function SharePage(props: PageProps<"/t/[shareToken]">) {
 
   if (!shipment) {
     return (
-      <div className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6">
-        <div className="rounded-md border border-border bg-card p-6">
+      <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+        <div className="w-full max-w-lg rounded-md border border-border bg-card p-6">
           <h1 className="text-[20px] font-semibold">This link is no longer valid</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             The share link may have been regenerated. Ask the sender for a new one, or track by number.

@@ -6,6 +6,7 @@ import { createUserAction } from "@/actions/users";
 import { INITIAL_ACTION_STATE } from "@/lib/validation/form";
 import { Input } from "@/components/ui/input";
 import { Field, controlClass } from "@/components/admin/form-field";
+import { PasswordInput } from "@/components/admin/password-input";
 import { SubmitButton } from "@/components/admin/submit-button";
 
 export function UserForm() {
@@ -30,13 +31,13 @@ export function UserForm() {
           <Input id="email" name="email" type="email" className={controlClass} required />
         </Field>
         <Field id="password" label="Password" hint="At least 8 characters." errors={errors.password}>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             minLength={8}
             autoComplete="new-password"
             className={controlClass}
+            aria-invalid={!!errors.password}
             required
           />
         </Field>

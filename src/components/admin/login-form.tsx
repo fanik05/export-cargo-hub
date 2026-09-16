@@ -6,6 +6,7 @@ import { INITIAL_ACTION_STATE } from "@/lib/validation/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, controlClass } from "@/components/admin/form-field";
+import { PasswordInput } from "@/components/admin/password-input";
 
 export function LoginForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState(login, INITIAL_ACTION_STATE);
@@ -26,10 +27,9 @@ export function LoginForm({ next }: { next?: string }) {
         />
       </Field>
       <Field id="password" label="Password" errors={errors.password}>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="current-password"
           className={controlClass}
           aria-invalid={!!errors.password}

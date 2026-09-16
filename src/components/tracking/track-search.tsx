@@ -36,13 +36,13 @@ export function TrackSearch({ defaultValue = "", compact = false, autoFocus = fa
         aria-label="Tracking number"
         className={cn(
           height,
-          "rounded-md border-input bg-white px-3 font-mono text-sm text-foreground md:text-sm",
+          "rounded-md border-input bg-card px-3 font-mono text-sm text-foreground md:text-sm",
         )}
         autoFocus={autoFocus}
       />
       <Button
         type="submit"
-        className={cn(height, "shrink-0 rounded-md bg-amber px-5 text-sm text-[#111827] hover:bg-[#D97706]")}
+        className={cn(height, "shrink-0 rounded-md bg-amber px-5 text-sm text-[#111827] hover:bg-amber-hover")}
       >
         Track
       </Button>
