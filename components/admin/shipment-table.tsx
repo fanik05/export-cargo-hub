@@ -3,6 +3,7 @@ import { AirplaneIcon, ArrowRightIcon, BoatIcon } from "@phosphor-icons/react/di
 import type { ShipmentRow } from "@/lib/shipments/service";
 import { formatDate, modeLabel } from "@/lib/format";
 import { StatusBadge } from "@/components/tracking/status-badge";
+import { ShipmentPreviewDrawer } from "@/components/admin/shipment-preview-drawer";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const headClass = "h-10 bg-muted px-4 text-[13px] font-medium text-muted-foreground";
@@ -45,12 +46,7 @@ export function ShipmentTable({ rows }: { rows: ShipmentRow[] }) {
               className="border-b-0 odd:bg-white even:bg-[#FAFBFC] hover:bg-amber-soft/40"
             >
               <TableCell className={cellClass}>
-                <Link
-                  href={`/admin/shipments/${s.id}`}
-                  className="rounded-md font-mono font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  {s.trackingNumber}
-                </Link>
+                <ShipmentPreviewDrawer row={s} />
               </TableCell>
               <TableCell className={cellClass}>
                 <span className="inline-flex items-center gap-2">
